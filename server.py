@@ -18,8 +18,6 @@ server.bind(addr)
 
 
 def accept_incoming_connections():
-    pid = subprocess.Popen(args=["gnome-terminal", "--command=python3 logger.py"]).pid
-    print(pid) 
     while True:
         client, client_address = server.accept()
         print("%s:%s has connected," % client_address)
