@@ -1,8 +1,13 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
+import os
+import time
+import subprocess
 
 clients = {}
 addresses = {}
+path = os.getcwd()
+os.mkfifo(path+'/myfifo.fifo')
 
 host = '127.0.0.1'
 port = 5000
@@ -13,6 +18,8 @@ server.bind(addr)
 
 
 def accept_incoming_connections():
+    pid = subprocess.Popen(args=["gnome-terminal", "--command=python3 logger.py"]).pid
+    print(pid) 
     while True:
         client, client_address = server.accept()
         print("%s:%s has connected," % client_address)
@@ -41,6 +48,9 @@ def handle_client(client):
 def broadcast(msg, prefix=""):
     for sock in clients:
         sock.send(bytes(prefix, "utf-8")+msg)
+    fifo = open(path+'/myfifo.fifo', "w")
+    fifo.write("%s\n" %msg)
+    fifo.close()
 
 
 if __name__ == "__main__":
