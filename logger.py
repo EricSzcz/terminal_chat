@@ -4,7 +4,7 @@ import time
 
 
 def listener():
-	path = os.getcwd()
+	path = os.getcwd()+'/'
 	fifo = open(path+'/myfifo.fifo', "r")
 	for line in fifo:
 		f = open("chat_log", "a+")
@@ -14,8 +14,11 @@ def listener():
 
 
 if __name__ == "__main__":
-	print('logger is running...')
-	while True:
-		listener()
+	try:
+		print('logger is running...')
+		while True:
+			listener()
+	except:
+		os._exit(0)
 
 

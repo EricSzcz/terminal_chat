@@ -1,6 +1,8 @@
 from socket import AF_INET, socket, SOCK_STREAM
-from threading import Thread
+import threading
 import time
+import signal
+import os
 
 
 host = '127.0.0.1'
@@ -12,7 +14,7 @@ client_socket.connect(addr)
 
 
 def receive():
-    while True:
+    while not shutdown_flag.is_set():
         try:
             msg = client_socket.recv(bufsiz).decode("utf-8")
             print(msg)
@@ -31,8 +33,27 @@ def send():
         exit()
 
 
+class ChatExit(Exception):
+    pass
+
+
+def handler(signum, stack):
+    print('Caught signal %d' % signum)
+    raise ChatExit
+
+
 if __name__ == "__main__":
-    receive_thread = Thread(target=receive)
-    receive_thread.start()
-    while True:
-        send()
+    try:
+        signal.signal(signal.SIGTERM, handler)
+        signal.signal(signal.SIGINT, handler)
+        shutdown_flag = threading.Event()
+
+        receive_thread = threading.Thread(target=receive)
+        receive_thread.start()
+        while not shutdown_flag.is_set():
+            send()
+    except ChatExit:
+        client_socket.send(bytes('{q}', "utf-8"))
+        client_socket.close()
+        shutdown_flag.set()
+        os._exit(0)
