@@ -1,4 +1,3 @@
-Execute server.py first
-After chat.py
+Execute server.py first, after chat.py
 
-the logger.py will save the log file in the same directory of the application is runing
+the logger.py will save the log file in the same directory of the application is running
